@@ -3,29 +3,53 @@ package dao;
 import model.Usuario;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class LoginDao {
 
-    public Usuario login(){
-        Statement st = null;
+    public boolean login(Usuario usuario){
+        PreparedStatement st = null;
         Connection conn = Conexao.getConn();
-        Usuario usuario = null;
         try {
-            st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM usuarios LIMIT 1;");
+            st = conn.prepareStatement("SELECT * FROM usuarios u WHERE u.login = ? and u.senha = ? LIMIT 1;");
+            st.setString(1,usuario.getLogin());
+            st.setString(2,usuario.getSenha());
+            ResultSet rs = st.executeQuery();
             while(rs.next()){
-                usuario = new Usuario();
-                usuario.setId(rs.getInt(1));
-                usuario.setLogin(rs.getString(2));
-                usuario.setSenha(rs.getString(3));
+                usuario.setVotou(rs.getBoolean("votou"));
+                st = conn.prepareStatement("UPDATE usuarios SET token = ? ; ");
+                st.setInt(1,usuario.getToken());
+                st.executeUpdate();
+                return true;
             }
+            return false;
         }catch (Exception e){
             e.printStackTrace();
             System.out.println( e.getClass().getName()+": "+ e.getMessage() );
             System.exit(0);
         }
-        return usuario;
+        return false;
+    }
+
+    public boolean validarToken(Usuario usuario){
+        PreparedStatement st = null;
+        Connection conn = Conexao.getConn();
+        try {
+            st = conn.prepareStatement("SELECT * FROM usuarios u WHERE u.id = ? and u.token = ? LIMIT 1;");
+            st.setInt(1,usuario.getId());
+            st.setInt(2,usuario.getToken());
+            ResultSet rs = st.executeQuery();
+            while(rs.next()){
+                return true;
+            }
+            return false;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println( e.getClass().getName()+": "+ e.getMessage() );
+            System.exit(0);
+        }
+        return false;
     }
 }

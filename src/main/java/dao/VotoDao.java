@@ -46,7 +46,7 @@ public class VotoDao {
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 voto.setIdFilme(rs.getInt("filme"));
-                voto.setIdFilme(rs.getInt("diretor"));
+                voto.setIdDiretor(rs.getInt("diretor"));
             }
         }catch(Exception e){
             e.printStackTrace();

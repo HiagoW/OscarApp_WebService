@@ -19,8 +19,10 @@ public class LoginDao {
             ResultSet rs = st.executeQuery();
             while(rs.next()){
                 usuario.setVotou(rs.getBoolean("votou"));
-                st = conn.prepareStatement("UPDATE usuarios SET token = ? ; ");
+                usuario.setId(rs.getInt("id"));
+                st = conn.prepareStatement("UPDATE usuarios SET token = ? WHERE id = ?; ");
                 st.setInt(1,usuario.getToken());
+                st.setInt(2, usuario.getId());
                 st.executeUpdate();
                 return true;
             }
